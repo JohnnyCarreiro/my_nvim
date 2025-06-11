@@ -1,0 +1,136 @@
+-- local defaults = require("lsp.defaults")
+--
+-- local on_attach = function(_, bufnr)
+--   local format_sync_grp = vim.api.nvim_create_augroup("Format", {})
+--   vim.api.nvim_create_autocmd("BufWritePre", {
+--     pattern = "*.rs",
+--     callback = function()
+--       vim.lsp.buf.format({ timeout_ms = 200 })
+--     end,
+--     group = format_sync_grp,
+--   })
+--
+--   vim.opt.updatetime = 300
+--
+--   local keymap = vim.keymap -- for conciseness
+--
+--   local opts = { noremap = true, silent = true }
+--
+--   opts.buffer = bufnr
+--
+--   -- Rebuild Macros
+--   opts.desc = "[R]ebuild [M]acros"
+--   keymap.set("n", "<leader>rm", function()
+--     if vim.fn.expand("%:t") == "Cargo.toml" then
+--       -- vim.cmd.RustLsp("reloadMacros")
+--       require("ferris.methods.rebuild_macros")
+--     end
+--   end, opts)
+--
+--   -- Reload Workspace
+--   opts.desc = "[R]eload [W]orkspace"
+--   keymap.set("n", "<leader>rw", function()
+--     if vim.fn.expand("%:t") == "Cargo.toml" then
+--       -- vim.cmd.RustLsp("reloadMacros")
+--       require("ferris.methods.reload_workspace")()
+--     end
+--   end, opts)
+-- end
+--
+-- return {
+--   "mrcjkb/rustaceanvim",
+--   version = "^6", -- Recommended
+--   -- lazy = false, -- This plugin is already lazy
+--   -- ft = { "rust" },
+--   opts = {
+--     server = {
+--       capabilities = defaults.capabilities,
+--       on_attach = function(client, bufnr)
+--         defaults.on_attach({ data = { client_id = client.id }, buf = bufnr })
+--
+--         vim.opt.updatetime = 100
+--         vim.keymap.set("n", "<leader>dr", function()
+--           vim.cmd.RustLsp("debuggables")
+--         end, { desc = "Rust Debuggables", buffer = bufnr })
+--         on_attach(client, bufnr)
+--       end,
+--       default_settings = {
+--         -- rust-analyzer language server configuration
+--         ["rust-analyzer"] = {
+--           assist = {
+--             importEnforceGranularity = true,
+--             -- importEnforceGranularity = "module",
+--             importPrefix = "crate",
+--           },
+--           cargo = {
+--             allFeatures = true,
+--             loadOutDirsFromCheck = false,
+--             buildScripts = {
+--               enable = true,
+--             },
+--           },
+--           -- Add clippy lints for Rust.
+--           checkOnSave = { command = "clippy" },
+--           -- checkOnSave = { command = "check" },
+--           -- check = { command = "rust_analyzer" },
+--           check = { command = "clippy" },
+--           -- Add clippy lints for Rust if using rust-analyzer
+--           -- checkOnSave = diagnostics == "rust-analyzer",
+--           -- Enable diagnostics if using rust-analyzer
+--           diagnostics = {
+--             -- enable = diagnostics == "rust-analyzer",
+--             enable = true,
+--             disabled = { "inactive-code" },
+--             experimental = {
+--               enable = false,
+--             },
+--           },
+--           procMacro = {
+--             enable = true,
+--             ignored = {
+--               ["async-trait"] = { "async_trait" },
+--               ["napi-derive"] = { "napi" },
+--               ["async-recursion"] = { "async_recursion" },
+--             },
+--           },
+--           rustfmt = {
+--             -- overrideCommand = { tab_spaces = 2 },
+--           },
+--           --   diagnostics = {
+--           --     enable = true,
+--           --     experimental = {
+--           --       enable = false,
+--           --     },
+--           --   },
+--           files = {
+--             excludeDirs = {
+--               ".direnv",
+--               ".git",
+--               ".github",
+--               ".gitlab",
+--               "bin",
+--               "node_modules",
+--               "target",
+--               "venv",
+--               ".venv",
+--             },
+--             watcher = "notify",
+--           },
+--           cachePriming = {
+--             enable = true,
+--           },
+--         },
+--       },
+--     },
+--   },
+--   config = function(_, opts)
+--     vim.g.rustaceanvim = vim.tbl_deep_extend("keep", vim.g.rustaceanvim or {}, opts or {})
+--     if vim.fn.executable("rust-analyzer") == 0 then
+--       LazyVim.error(
+--         "**rust-analyzer** not found in PATH, please install it.\nhttps://rust-analyzer.github.io/",
+--         { title = "rustaceanvim" }
+--       )
+--     end
+--   end,
+-- }
+return {}

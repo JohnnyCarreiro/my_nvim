@@ -1,0 +1,7 @@
+require("lsp.langs.php")
+require("lsp.langs.java")
+require("lsp.langs.tailwind")
+require("lsp.langs.typescript")
+-- require("lsp.langs.new-typescript")
+-- require("lsp.langs.rust-analyzer")
+-- require("lsp.langs.vue")

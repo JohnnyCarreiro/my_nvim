@@ -1,0 +1,218 @@
+-- -- Custom fold function combining Tree-sitter and fallback for Rust comments
+-- function ExtendedFoldExpr(lnum)
+--   -- Try to get Tree-sitter fold level
+--   local ts_fold = vim.treesitter.foldexpr and vim.treesitter.foldexpr(lnum) or "0"
+--
+--   -- If Tree-sitter returns a valid fold level, use it
+--   if ts_fold ~= "0" then
+--     return ts_fold
+--   end
+--
+--   -- Fallback for Rust `///` doc comments
+--   local line = vim.api.nvim_buf_get_lines(0, lnum - 1, lnum, false)[1]
+--   if line and line:match("^///") then
+--     local start_line = lnum
+--     local end_line = lnum
+--
+--     -- Find the start of the comment block
+--     while start_line > 1 do
+--       local prev_line = vim.api.nvim_buf_get_lines(0, start_line - 2, start_line - 1, false)[1]
+--       if not prev_line or not prev_line:match("^///") then
+--         break
+--       end
+--       start_line = start_line - 1
+--     end
+--
+--     -- Find the end of the comment block
+--     while true do
+--       local next_line = vim.api.nvim_buf_get_lines(0, end_line, end_line + 1, false)[1]
+--       if not next_line or not next_line:match("^///") then
+--         break
+--       end
+--       end_line = end_line + 1
+--     end
+--
+--     return tostring(start_line + 1)
+--   end
+--
+--   -- Default: no fold
+--   return "0"
+-- end
+--
+-- function HighlightedFoldtext()
+--   local pos = vim.v.foldstart
+--   local end_pos = vim.v.foldend
+--   local lines = vim.api.nvim_buf_get_lines(0, pos - 1, end_pos, false)
+--
+--   if #lines == 0 then
+--     return vim.fn.foldtext()
+--   end
+--
+--   local first_line = lines[1]
+--   local second_line = lines[2] or ""
+--
+--   -- Verifica se é um comentário de documentação (Rust `///`, JS/TS/Java/Dart `/** ... */`)
+--   if first_line:match("^///") or first_line:match("^/%*%*") then
+--     return vim.trim(first_line) .. " " .. vim.trim(second_line) .. string.format(" ... [%d lines]", end_pos - pos + 1)
+--   end
+--
+--   -- Mantém a lógica original para capturas do Tree-sitter
+--   local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
+--   local parser = vim.treesitter.get_parser(0, lang)
+--   local query = vim.treesitter.query.get(parser:lang(), "highlights")
+--
+--   if query == nil then
+--     return vim.fn.foldtext()
+--   end
+--
+--   local tree = parser:parse({ pos - 1, end_pos })[1]
+--   local result = {}
+--
+--   local line_pos = 0
+--   local prev_range = nil
+--
+--   for id, node, _ in query:iter_captures(tree:root(), 0, pos - 1, end_pos) do
+--     local name = query.captures[id]
+--     local start_row, start_col, end_row, end_col = node:range()
+--     if start_row >= pos - 1 and end_row <= end_pos - 1 then
+--       local range = { start_col, end_col }
+--       if start_col > line_pos then
+--         table.insert(result, { first_line:sub(line_pos + 1, start_col), "Folded" })
+--       end
+--       line_pos = end_col
+--       local text = vim.treesitter.get_node_text(node, 0)
+--       if prev_range ~= nil and range[1] == prev_range[1] and range[2] == prev_range[2] then
+--         result[#result] = { text, "@" .. name }
+--       else
+--         table.insert(result, { text, "@" .. name })
+--       end
+--       prev_range = range
+--     end
+--   end
+--
+--   -- Mantém o fallback original
+--   if #result == 0 then
+--     table.insert(result, { first_line, "Folded" })
+--   end
+--
+--   return result
+-- end
+--
+-- local bg = vim.api.nvim_get_hl(0, { name = "StatusLine" }).bg
+-- local hl = vim.api.nvim_get_hl(0, { name = "Folded" })
+-- hl.bg = bg
+-- vim.api.nvim_set_hl(0, "Folded", hl)
+--
+-- vim.opt.foldtext = [[luaeval('HighlightedFoldtext')()]]
+--
+-- -- Set fold method and custom fold expression
+-- vim.wo.foldmethod = "expr"
+-- vim.wo.foldexpr = "v:lua.ExtendedFoldExpr(v:lnum)"
+-- -- vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+--
+-- vim.opt.foldlevel = 99 -- Mantém os outros folds abertos
+-- vim.opt.foldexpr = "v:lua.ExtendedFoldExpr()" -- Usa a função personalizada
+-- vim.opt.foldtext = "v:lua.HighlightedFoldtext()" -- Aplica o highlight nos folds
+--
+-- vim.api.nvim_create_autocmd("BufReadPost", {
+--   callback = function()
+--     -- Mantém apenas as classes e métodos abertos
+--     vim.cmd("setlocal foldlevelstart=99") -- Não fecha os métodos
+--
+--     -- Fecha apenas os comentários de documentação (bloco e linha)
+--     vim.defer_fn(function()
+--       vim.cmd([[ silent! g/^\s*\/\*\*/normal! zc ]]) -- Fecha `/** ... */`
+--       vim.cmd([[ silent! g/^\s*\/\//normal! zc ]]) -- Fecha `///` ou `//`
+--     end, 50) -- Pequeno delay para garantir que os folds já tenham sido processados
+--   end,
+-- })
+-- --
+-- return {
+--   {
+--     "nvim-treesitter/nvim-treesitter",
+--     build = ":TSUpdate",
+--     config = function()
+--       local configs = require("nvim-treesitter.configs")
+--
+--       configs.setup({
+--         ensure_installed = {
+--           "c",
+--           "lua",
+--           "vim",
+--           "vimdoc",
+--           "query",
+--           "elixir",
+--           "heex",
+--           "json",
+--           "javascript",
+--           "typescript",
+--           "tsx",
+--           "yaml",
+--           "html",
+--           "css",
+--           "prisma",
+--           "markdown",
+--           "markdown_inline",
+--           "graphql",
+--           "bash",
+--           "dockerfile",
+--           "gitignore",
+--           "java",
+--           "rust",
+--           "php",
+--           "blade",
+--           "php_only",
+--           "java",
+--           "vue",
+--           -- "groq",
+--         },
+--         auto_install = true,
+--         sync_install = false,
+--         highlight = { enable = true, additional_vim_regex_highlighting = false },
+--         indent = { enable = true },
+--         autotag = {
+--           enable = true,
+--         },
+--         -- query_linter = {
+--         --   enable = true,
+--         --   use_virtual_text = true,
+--         --   lint_events = { "BufWrite", "CursorHold" },
+--         -- },
+--         fold = { enable = true },
+--
+--         incremental_selection = {
+--           enable = true,
+--           keymaps = {
+--             init_selection = "<Enter>", -- set to `false` to disable one of the mappings
+--             node_incremental = "<Enter>",
+--             scope_incremental = false,
+--             node_decremental = "<Backspace>",
+--           },
+--         },
+--       })
+--
+--       -- require("nvim-treesitter.parsers").get_parser_configs().groq = {
+--       --   install_info = {
+--       --     url = "https://github.com/Herob527/treesitter-parser-groq",
+--       --     files = { "src/parser.c" },
+--       --     -- files = { "grammar.js" },
+--       --     branch = "main",
+--       --   },
+--       --   filetype = "groq",
+--       -- }
+--       -- save to queries/javascript/injections.scm
+--       -- (variable_declarator
+--       -- (comment) @groq_comment
+--       -- (#eq? @groq_comment "/* GROQ */")
+--       -- (template_string) @groq)
+--     end,
+--   },
+--   {
+--     "nvim-treesitter/playground",
+--   },
+--   {
+--     "stsewd/tree-sitter-comment",
+--   },
+-- }
+
+return {}
