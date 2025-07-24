@@ -1,0 +1,91 @@
+return {
+  {
+    "folke/noice.nvim",
+    opts = {
+      lsp = {
+        hover = {
+          enabled = false, -- this will disable hover warning
+        },
+        signature = {
+          enabled = false, -- this will disable signtature warning.
+        },
+        override = {
+          ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+          ["vim.lsp.util.stylize_markdown"] = true,
+          ["cmp.entry.get_documentation"] = true,
+        },
+      },
+      dependencies = {
+        -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+        "MunifTanjim/nui.nvim",
+        -- OPTIONAL:
+        --   `nvim-notify` is only needed, if you want to use the notification view.
+        --   If not available, we use `mini` as the fallback
+        "rcarriga/nvim-notify",
+        -- "hrsh7th/nvim-cmp",
+      },
+      routes = {
+        {
+          filter = {
+            event = "msg_show",
+            any = {
+              { find = "%d+L, %d+B" },
+              { find = "; after #%d+" },
+              { find = "; before #%d+" },
+            },
+          },
+          view = "mini",
+        },
+      },
+      presets = {
+        bottom_search = true, -- use a classic bottom cmdline for search
+        command_palette = true, -- position the cmdline and popupmenu together
+        long_message_to_split = true, -- long messages will be sent to a split
+        inc_rename = false, -- enables an input dialog for inc-rename.nvim
+        lsp_doc_border = false, -- add a border to hover docs and signature help
+      },
+    },
+
+    config = function(_, opts)
+      -- HACK: noice shows messages from before it was enabled,
+      -- but this is not ideal when Lazy is installing plugins,
+      -- so clear the messages in this case.
+      if vim.o.filetype == "lazy" then
+        vim.cmd([[messages clear]])
+      end
+      require("noice").setup(opts)
+    end,
+  },
+  { "MunifTanjim/nui.nvim", lazy = true },
+  -- stylua: ignore
+  vim.keymap.set("n", "<leader>snl", function() require("noice").cmd("last") end, {desc = "Noice Last Message"} ),
+  vim.keymap.set("n", "<leader>sn", "", { desc = "+noice" }),
+  vim.keymap.set("c", "<S-Enter>", function()
+    require("noice").redirect(vim.fn.getcmdline())
+  end, { desc = "Redirect Cmdline" }),
+  vim.keymap.set("n", "<leader>snl", function()
+    require("noice").cmd("last")
+  end, { desc = "Noice Last Message" }),
+  vim.keymap.set("n", "<leader>snh", function()
+    require("noice").cmd("history")
+  end, { desc = "Noice History" }),
+  vim.keymap.set("n", "<leader>sna", function()
+    require("noice").cmd("all")
+  end, { desc = "Noice All" }),
+  vim.keymap.set("n", "<leader>snd", function()
+    require("noice").cmd("dismiss")
+  end, { desc = "Dismiss All" }),
+  vim.keymap.set({ "i", "n", "s" }, "<leader>snt", function()
+    require("noice").cmd("pick")
+  end, { desc = "Noice Picker (Telescope/FzfLua)" }),
+  vim.keymap.set({ "i", "n", "s" }, "<c-f>", function()
+    if not require("noice.lsp").scroll(4) then
+      return "<c-f>"
+    end
+  end, { silent = true, expr = true, desc = "Scroll Forward" }),
+  vim.keymap.set({ "i", "n", "s" }, "<c-b>", function()
+    if not require("noice.lsp").scroll(-4) then
+      return "<c-b>"
+    end
+  end, { silent = true, expr = true, desc = "Scroll Backward" }),
+}

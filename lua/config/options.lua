@@ -9,7 +9,10 @@ vim.opt.guicursor = "n:block"
 vim.opt.guicursor = "i:blinkon1"
 vim.opt.textwidth = 90
 
-vim.opt.clipboard:append("unnamedplus") -- use system clipboard as default register
+-- vim.opt.clipboard:append("unnamedplus") -- use system clipboard as default register
+if vim.fn.has("clipboard") == 1 then
+  vim.opt.clipboard:append("unnamedplus")
+end
 
 vim.opt.smarttab = true
 vim.opt.smartindent = true

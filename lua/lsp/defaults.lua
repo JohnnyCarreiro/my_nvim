@@ -11,7 +11,7 @@ M.capabilities = capabilities
 -- Default on_attach
 M.on_attach = function(event)
   vim.opt.updatetime = 300
-  vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
+  -- vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
 
   local map = function(keys, func, desc, mode)
     mode = mode or "n"

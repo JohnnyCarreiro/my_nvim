@@ -1,33 +1,33 @@
 -- requires pnpm install -g neovim
 return {
-	-- "luckasRanarison/tailwind-tools.nvim",
-	-- name = "tailwind-tools",
-	-- build = ":UpdateRemotePlugins",
-	-- dependencies = {
-	-- 	"nvim-treesitter/nvim-treesitter",
-	-- 	"nvim-telescope/telescope.nvim", -- optional
-	-- 	"neovim/nvim-lspconfig", -- optional
-	-- },
-	-- opts = {
-	-- 	conceal = {
-	-- 		enabled = true, -- can be toggled by commands
-	-- 		min_length = nil, -- only conceal classes exceeding the provided length
-	-- 		symbol = "󱏿", -- only a single character is allowed
-	-- 		highlight = { -- extmark highlight options, see :h 'highlight'
-	-- 			fg = "#38BDF8",
-	-- 		},
-	-- 	},
-	-- }, -- your configuration
-	-- config = function()
-	-- 	require("tailwind-tools").setup({
-	-- 		conceal = {
-	-- 			enabled = true, -- can be toggled by commands
-	-- 			min_length = nil, -- only conceal classes exceeding the provided length
-	-- 			symbol = "󱏿", -- only a single character is allowed
-	-- 			highlight = { -- extmark highlight options, see :h 'highlight'
-	-- 				fg = "#38BDF8",
-	-- 			},
-	-- 		},
-	-- 	})
-	-- end,
+  "luckasRanarison/tailwind-tools.nvim",
+  name = "tailwind-tools",
+  build = ":UpdateRemotePlugins",
+  dependencies = {
+    "nvim-treesitter/nvim-treesitter",
+    "nvim-telescope/telescope.nvim", -- optional
+    "neovim/nvim-lspconfig", -- optional
+  },
+  opts = {
+    conceal = {
+      enabled = true, -- can be toggled by commands
+      min_length = nil, -- only conceal classes exceeding the provided length
+      symbol = "󱏿", -- only a single character is allowed
+      highlight = { -- extmark highlight options, see :h 'highlight'
+        fg = "#38BDF8",
+      },
+    },
+  }, -- your configuration
+  config = function()
+    require("tailwind-tools").setup({
+      conceal = {
+        enabled = true, -- can be toggled by commands
+        min_length = nil, -- only conceal classes exceeding the provided length
+        symbol = "󱏿", -- only a single character is allowed
+        highlight = { -- extmark highlight options, see :h 'highlight'
+          fg = "#38BDF8",
+        },
+      },
+    })
+  end,
 }
